@@ -9,6 +9,11 @@ void main() {
     ..value = loadDocument()
     ..onKeyUp.listen((_) =>
         window.localStorage["MyTextEditor"] = json.encode(theEditor.value));
+
+  ButtonInputElement btnClear = querySelector("#btnClearText");
+  btnClear.onClick.listen((_) {
+      theEditor.value = "";
+      window.localStorage["MyTextEditor"] = json.encode(theEditor.value);});
 }
 
 String loadDocument() {
