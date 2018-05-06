@@ -10,10 +10,12 @@ void main() {
     ..onKeyUp.listen(saveDocument);
 
   ButtonInputElement btnClear = querySelector("#btnClearText");
-  btnClear.onClick.listen((_) {
+  btnClear.onClick.listen(clearDocument);
+}
+
+void clearDocument(_) {
     theEditor.value = "";
     saveDocument(_);
-  });
 }
 
 void saveDocument(_) {
