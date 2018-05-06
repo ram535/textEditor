@@ -7,14 +7,17 @@ void main() {
   theEditor = querySelector("#editor");
   theEditor
     ..value = loadDocument()
-    ..onKeyUp.listen((_) =>
-        window.localStorage["MyTextEditor"] = json.encode(theEditor.value));
+    ..onKeyUp.listen((_)=>saveDocument());
 
   ButtonInputElement btnClear = querySelector("#btnClearText");
   btnClear.onClick.listen((_) {
     theEditor.value = "";
-    window.localStorage["MyTextEditor"] = json.encode(theEditor.value);
+    saveDocument();
   });
+}
+
+void saveDocument() {
+    window.localStorage["MyTextEditor"] = json.encode(theEditor.value);
 }
 
 String loadDocument() {
