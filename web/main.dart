@@ -12,8 +12,9 @@ void main() {
 
   ButtonInputElement btnClear = querySelector("#btnClearText");
   btnClear.onClick.listen((_) {
-      theEditor.value = "";
-      window.localStorage["MyTextEditor"] = json.encode(theEditor.value);});
+    theEditor.value = "";
+    window.localStorage["MyTextEditor"] = json.encode(theEditor.value);
+  });
 }
 
 String loadDocument() {
