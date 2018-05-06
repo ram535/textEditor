@@ -1,0 +1,17 @@
+The objective of this project is to create a small text editor (web app) using Dart 2.
+It is going to be based from the "Dart: Scalable Application Development".
+
+* Tutorial
+  We are going to build the text editor step by step.
+** Setting up the project
+   To set up the project we need to follow the next instructions:
+
+   - Create a dart project using *stagehand*.
+     #+BEGIN_SRC
+     stagehand web-simple
+     pub get
+     #+END_SRC
+   - Check if project was created correctly.
+     #+BEGIN_SRC
+     pub run build_runner serve
+     #+END_SRC
