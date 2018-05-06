@@ -1,5 +1,7 @@
 import 'dart:html';
 
+TextAreaElement theEditor;
+
 void main() {
-  querySelector('#output').text = 'Your Dart app is running.';
+  theEditor = querySelector("#editor");
 }
