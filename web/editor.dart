@@ -6,19 +6,15 @@ class TextEditor {
   TextEditor(this.theEditor) {
     theEditor
       ..value = loadDocument()
-      ..onKeyUp.listen(handleKeyPress);
+      ..onKeyUp.listen(saveDocument);
   }
 
   void clearDocument(MouseEvent event) {
     theEditor.value = "";
-    saveDocument();
+    saveDocument(event);
   }
 
-  void handleKeyPress(KeyboardEvent event) {
-    saveDocument();
-  }
-
-  void saveDocument() {
+  void saveDocument(dynamic event) {
     window.localStorage["MyTextEditor"] = json.encode(theEditor.value);
   }
 
