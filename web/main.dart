@@ -1,31 +1,11 @@
 import 'dart:html';
-import 'dart:convert' show json;
+import 'editor.dart';
 
-TextAreaElement theEditor;
+TextEditor theEditor;
 
 void main() {
-  theEditor = querySelector("#editor");
-  theEditor
-    ..value = loadDocument()
-    ..onKeyUp.listen(saveDocument);
+  theEditor = TextEditor(querySelector("#editor"));
 
   ButtonInputElement btnClear = querySelector("#btnClearText");
-  btnClear.onClick.listen(clearDocument);
-}
-
-void clearDocument(_) {
-    theEditor.value = "";
-    saveDocument(_);
-}
-
-void saveDocument(_) {
-    window.localStorage["MyTextEditor"] = json.encode(theEditor.value);
-}
-
-String loadDocument() {
-  String readings = "";
-  String jsonString = window.localStorage["MyTextEditor"];
-  if (jsonString != null && jsonString.length > 0)
-    readings = json.decode(jsonString);
-  return readings;
+  btnClear.onClick.listen(theEditor.clearDocument);
 }
