@@ -8,7 +8,21 @@ class Dialog {
     dialogBox
       ..classes.toggle("dialog-box")
       ..style.width = "${width}px"
-      ..style.height = "${height}px";
+      ..style.height = "${height}px"
+      ..children.add(makeButton());
     document.body.append(dialogBox);
+  }
+
+  ButtonInputElement makeButton() {
+    ButtonInputElement button = ButtonInputElement();
+    button
+      ..classes.toggle("dialog-box-button")
+      ..value = "CANCEL";
+    button.onClick.listen(remove);
+    return button;
+  }
+
+  void remove(MouseEvent me) {
+    document.body.children.remove(dialogBox);
   }
 }
