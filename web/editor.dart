@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:html';
+import 'dialog_base.dart';
 
 class TextEditor {
   final TextAreaElement theEditor;
@@ -24,5 +25,9 @@ class TextEditor {
     if (jsonString != null && jsonString.length > 0)
       readings = json.decode(jsonString);
     return readings;
+  }
+
+  void showDialogBox(MouseEvent event) {
+    Dialog(200, 200);
   }
 }
