@@ -13,6 +13,9 @@ body {
   border: 3px solid #E18728;
   border-radius: 10px;
   background-color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 input[type=button] {
@@ -26,7 +29,7 @@ input[type=button] {
   outline: none;
 }
 
-.dialog-box-button {
+/* .dialog-box-button {
   margin-left: auto !important;
   margin-right: auto !important;
-}
+} */

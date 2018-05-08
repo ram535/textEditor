@@ -13,6 +13,12 @@ class AboutBox extends Dialog {
     link
       ..href = linkUrl
       ..text = linkText;
-    contentBox..children.add(title)..children.add(link);
+    contentBox
+      ..children.add(title)
+      ..children.add(link)
+      ..children.add(BRElement())
+      ..children.add(BRElement())
+      ..children.add(BRElement())
+      ..children.add(BRElement());
   }
 }
