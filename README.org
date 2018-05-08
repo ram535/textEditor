@@ -3,7 +3,7 @@ It is going to be based from the "Dart: Scalable Application Development".
 
 * Tutorial
   We are going to build the text editor step by step.
-** Setting up the project
+** Set up the project
    To set up the project we need to follow the next instructions:
 
    - Create a dart project using *stagehand*.
@@ -15,3 +15,521 @@ It is going to be based from the "Dart: Scalable Application Development".
      #+BEGIN_SRC
      pub run build_runner serve
      #+END_SRC
+** Add <textarea> tag
+   This textarea tag is going be our main part of the text editor.
+   #+BEGIN_SRC html
+     <!DOCTYPE html>
+
+     <html>
+     <head>
+         <meta charset="utf-8">
+         <meta http-equiv="X-UA-Compatible" content="IE=edge">
+         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+         <title>Text Editor</title>
+         <link rel="stylesheet" href="styles.css">
+         <link rel="icon" href="favicon.ico">
+         <script defer src="main.dart.js"></script>
+     </head>
+
+     <body>
+
+       <div id="toolbar"> Toolbar </div>
+         <textarea id="editor" cols="80" autofocus> </textarea>
+       </div>
+
+     </body>
+     </html>
+   #+END_SRC
+** Create a variable and associate it with the <textarea> tag
+   We are importing the *dart:html* library so we can create a variable of the type *TextAreaElement*.
+   After that we associate it with *querySelector()* method to the *<textarea> tag*.
+   #+BEGIN_SRC dart
+     import 'dart:html';
+
+     TextAreaElement theEditor;
+
+     void main() {
+       theEditor = querySelector("#editor");
+     }
+   #+END_SRC
+** Save the text in the <textarea> in the *Local Storage*
+   The window.localStorage is part of HTML5. It allows you to save data in the client side.
+   We need to import the *dart:convert* library because the data must be save in json format in the local storage.
+   *dart:conver* allows as to marshall and unmarshall json format.
+
+   #+begin_src dart
+     import 'dart:html';
+     import 'dart:convert' show json;
+
+     TextAreaElement theEditor;
+
+     void main() {
+       theEditor = querySelector("#editor");
+       theEditor
+         ..onKeyUp.listen((_) =>
+             window.localStorage["MyTextEditor"] = json.encode(theEditor.value));
+     }
+   #+end_src
+
+   We could *..onKeyUp.listen((KeyboardEvent event) =>* but since we don't use the *KeyboardEvent*, we just ignore it with *(_)*.
+   In every key up from the keyboard, the text is being saved in the local storage. But to save it in the local storage first we need
+   to encode in json format.
+
+   *Important* It is not ignoring when we use *(_)* but it is dynamicly calculating the type of the variable. We could name it
+   any form like *(foo)* and it would be still running correctly.
+** Load the text store in *Local Storage* in to the <textarea> tag
+   The *loadDocument()* function loads the text store in the local storage.
+   This function when run for the first time ever will return a empty string since we check if
+   the key *MyTextEditor* is empty or null but since there is not yet a *MyTextEditor* key, we
+   just send a empty string. Otherwise we would get an error because we would try to read *MyTextEditor* key
+   that does not exist yet.
+
+   If there is text on the local storage, we first unmarshall the text with *json.decode()* method.
+
+   #+begin_src dart
+     import 'dart:html';
+     import 'dart:convert' show json;
+
+     TextAreaElement theEditor;
+
+     void main() {
+       theEditor = querySelector("#editor");
+       theEditor
+         ..value = loadDocument()
+         ..onKeyUp.listen((_) =>
+             window.localStorage["MyTextEditor"] = json.encode(theEditor.value));
+     }
+
+     String loadDocument() {
+       String readings = "";
+       String jsonString = window.localStorage["MyTextEditor"];
+       if (jsonString != null && jsonString.length > 0)
+         readings = json.decode(jsonString);
+       return readings;
+     }
+   #+end_src
+** Add a clear button
+   #+begin_src dart
+     <!DOCTYPE html>
+
+     <html>
+     <head>
+         <meta charset="utf-8">
+         <meta http-equiv="X-UA-Compatible" content="IE=edge">
+         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+         <title>Text Editor</title>
+         <link rel="stylesheet" href="styles.css">
+         <link rel="icon" href="favicon.ico">
+         <script defer src="main.dart.js"></script>
+     </head>
+
+     <body>
+
+       <div id="toolbar"> Toolbar </div>
+         <input type="button" id="btnClearText" value="Clear" />
+       </div>
+       <textarea id="editor" cols="80" autofocus> </textarea>
+
+     </body>
+     </html>
+   #+end_src
+** Create a variable and associate it with the <input type="button" id="btnClearText" value="Clear" />
+   We create a variable called *btnClear* and associate it with <input type="button" id="btnClearText" value="Clear" />.
+   Then we add the functionality to clear the text on the <textarea> and finally we save it to the local storage.
+   #+begin_src dart
+     import 'dart:html';
+     import 'dart:convert' show json;
+
+     TextAreaElement theEditor;
+
+     void main() {
+       theEditor = querySelector("#editor");
+       theEditor
+         ..value = loadDocument()
+         ..onKeyUp.listen((_) =>
+             window.localStorage["MyTextEditor"] = json.encode(theEditor.value));
+
+       ButtonInputElement btnClear = querySelector("#btnClearText");
+       btnClear.onClick.listen((_) {
+         theEditor.value = "";
+         window.localStorage["MyTextEditor"] = json.encode(theEditor.value);
+       });
+     }
+
+     String loadDocument() {
+       String readings = "";
+       String jsonString = window.localStorage["MyTextEditor"];
+       if (jsonString != null && jsonString.length > 0)
+         readings = json.decode(jsonString);
+       return readings;
+     }
+   #+end_src
+** Refactor the duplicated code on how the text is save in the local storage
+   #+begin_src dart
+     import 'dart:html';
+     import 'dart:convert' show json;
+
+     TextAreaElement theEditor;
+
+     void main() {
+       theEditor = querySelector("#editor");
+       theEditor
+         ..value = loadDocument()
+         ..onKeyUp.listen((_)=>saveDocument());
+
+       ButtonInputElement btnClear = querySelector("#btnClearText");
+       btnClear.onClick.listen((_) {
+         theEditor.value = "";
+         saveDocument();
+       });
+     }
+
+     void saveDocument() {
+         window.localStorage["MyTextEditor"] = json.encode(theEditor.value);
+     }
+
+     String loadDocument() {
+       String readings = "";
+       String jsonString = window.localStorage["MyTextEditor"];
+       if (jsonString != null && jsonString.length > 0)
+         readings = json.decode(jsonString);
+       return readings;
+     }
+   #+end_src
+** Refactor create a TextEditor Class
+   We clean and organize in a better way our project by creating and moving all the definitions and
+   functins of the text editor to a class and put it in a separate file.
+
+   The most important to notice is that we have to create a intermidiate function *handleKeyPress*
+   to handle the *KeyboardEvent* and then call *saveDocument* function since the *clearDocument*
+   function also called the *saveDocument* but by a *MouseEvent*.
+
+   Since we are using Dart 2, we can ommit using the keyword *new* when creating objects.
+
+   *main.dart*
+   #+begin_src dart
+     import 'dart:html';
+     import 'editor.dart';
+
+     TextEditor theEditor;
+
+     void main() {
+       theEditor = TextEditor(querySelector("#editor"));
+
+       ButtonInputElement btnClear = querySelector("#btnClearText");
+       btnClear.onClick.listen(theEditor.clearDocument);
+     }
+   #+end_src
+
+   *editor.dart*
+   #+begin_src dart
+     import 'dart:convert';
+     import 'dart:html';
+
+     class TextEditor {
+       final TextAreaElement theEditor;
+       TextEditor(this.theEditor) {
+         theEditor
+           ..value = loadDocument()
+           ..onKeyUp.listen(handleKeyPress);
+       }
+
+       void clearDocument(MouseEvent event) {
+         theEditor.value = "";
+         saveDocument();
+       }
+
+       void handleKeyPress(KeyboardEvent event) {
+         saveDocument();
+       }
+
+       void saveDocument() {
+         window.localStorage["MyTextEditor"] = json.encode(theEditor.value);
+       }
+
+       String loadDocument() {
+         String readings = "";
+         String jsonString = window.localStorage["MyTextEditor"];
+         if (jsonString != null && jsonString.length > 0)
+           readings = json.decode(jsonString);
+         return readings;
+       }
+     }
+   #+end_src
+** Refactor the TextEditor Class
+   We refactor the TextEditor class by removing the *handleKeyPress* method.
+   And making the *saveDocument* method take a *dynamic* event as a parameter.
+
+   #+begin_src dart
+     import 'dart:convert';
+     import 'dart:html';
+
+     class TextEditor {
+       final TextAreaElement theEditor;
+       TextEditor(this.theEditor) {
+         theEditor
+           ..value = loadDocument()
+           ..onKeyUp.listen(saveDocument);
+       }
+
+       void clearDocument(MouseEvent event) {
+         theEditor.value = "";
+         saveDocument(event);
+       }
+
+       void saveDocument(dynamic event) {
+         window.localStorage["MyTextEditor"] = json.encode(theEditor.value);
+       }
+
+       String loadDocument() {
+         String readings = "";
+         String jsonString = window.localStorage["MyTextEditor"];
+         if (jsonString != null && jsonString.length > 0)
+           readings = json.decode(jsonString);
+         return readings;
+       }
+     }
+   #+end_src
+** Create basic Dialog Class
+   *dialog_base.dart*
+   #+begin_src dart
+     import 'dart:html';
+
+     class Dialog {
+       int width = 0;
+       int height = 0;
+       DivElement dialogBox = DivElement();
+       Dialog(this.width, this.height) {
+         dialogBox
+           ..classes.toggle("dialog-box")
+           ..style.width = "${width}px"
+           ..style.height = "${height}px";
+         document.body.append(dialogBox);
+       }
+     }
+   #+end_src
+
+   *main.dart*
+   #+begin_src dart
+     import 'dart:html';
+     import 'editor.dart';
+
+     TextEditor theEditor;
+
+     void main() {
+       theEditor = TextEditor(querySelector("#editor"));
+
+       ButtonInputElement btnClear = querySelector("#btnClearText");
+       btnClear.onClick.listen(theEditor.clearDocument);
+
+       ButtonInputElement btnDialogBox = querySelector("#btnDialogBox");
+       btnDialogBox.onClick.listen(theEditor.showDialogBox);
+     }
+   #+end_src
+
+   *editor.dart*
+   #+begin_src dart
+     import 'dart:convert';
+     import 'dart:html';
+     import 'dialog_base.dart';
+
+     class TextEditor {
+       final TextAreaElement theEditor;
+       TextEditor(this.theEditor) {
+         theEditor
+           ..value = loadDocument()
+           ..onKeyUp.listen(saveDocument);
+       }
+
+       void clearDocument(MouseEvent event) {
+         theEditor.value = "";
+         saveDocument(event);
+       }
+
+       void saveDocument(dynamic event) {
+         window.localStorage["MyTextEditor"] = json.encode(theEditor.value);
+       }
+
+       String loadDocument() {
+         String readings = "";
+         String jsonString = window.localStorage["MyTextEditor"];
+         if (jsonString != null && jsonString.length > 0)
+           readings = json.decode(jsonString);
+         return readings;
+       }
+
+       void showDialogBox(MouseEvent event) {
+         Dialog(200, 200);
+       }
+     }
+   #+end_src
+
+   *index.html*
+   #+begin_src dart
+     <!DOCTYPE html>
+
+     <html>
+
+     <head>
+       <meta charset="utf-8">
+       <meta http-equiv="X-UA-Compatible" content="IE=edge">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>Text Editor</title>
+       <link rel="stylesheet" href="styles.css">
+       <link rel="icon" href="favicon.ico">
+       <script defer src="main.dart.js"></script>
+     </head>
+
+     <body>
+       <div>
+         <input type="button" id="btnClearText" class="btn" value="Clear" />
+         <input type="button" id="btnDialogBox" class="btn" value="Dialog Box" />
+       </div>
+
+       <textarea id="editor" cols="50" autofocus> </textarea>
+     </body>
+
+     </html>
+   #+end_src
+
+** Add a button and method to remove the dialog box
+   We add a button to the dialog box and associate with the remove() method to remove it from the DOM.
+
+   *dialog_base.dart*
+   #+begin_src dart
+     import 'dart:html';
+
+     class Dialog {
+       int width = 0;
+       int height = 0;
+       DivElement dialogBox = DivElement();
+       Dialog(this.width, this.height) {
+         dialogBox
+           ..classes.toggle("dialog-box")
+           ..style.width = "${width}px"
+           ..style.height = "${height}px"
+           ..children.add(makeButton());
+         document.body.append(dialogBox);
+       }
+
+       ButtonInputElement makeButton() {
+         ButtonInputElement button = ButtonInputElement();
+         button
+           ..classes.toggle("dialog-box-button")
+           ..value = "CANCEL";
+         button.onClick.listen(remove);
+         return button;
+       }
+
+       void remove(MouseEvent me) {
+         document.body.children.remove(dialogBox);
+       }
+     }
+   #+end_src
+** Add About dialog box inheret from Dialog Class
+   *index.html*
+   #+begin_src html
+     <!DOCTYPE html>
+
+     <html>
+
+     <head>
+       <meta charset="utf-8">
+       <meta http-equiv="X-UA-Compatible" content="IE=edge">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>Text Editor</title>
+       <link rel="stylesheet" href="styles.css">
+       <link rel="icon" href="favicon.ico">
+       <script defer src="main.dart.js"></script>
+     </head>
+
+     <body>
+       <div>
+         <input type="button" id="btnClearText" class="btn" value="Clear" />
+         <input type="button" id="btnAboutBox" class="btn" value="About" />
+       </div>
+
+       <textarea id="editor" cols="50" autofocus> </textarea>
+     </body>
+
+     </html>
+   #+end_src
+   *main.dart*
+   #+begin_src dart
+     import 'dart:html';
+     import 'editor.dart';
+
+     TextEditor theEditor;
+
+     void main() {
+       theEditor = TextEditor(querySelector("#editor"));
+
+       ButtonInputElement btnClear = querySelector("#btnClearText");
+       btnClear.onClick.listen(theEditor.clearDocument);
+
+       ButtonInputElement btnAboutBox = querySelector("#btnAboutBox");
+       btnAboutBox.onClick.listen(theEditor.showAboutBox);
+     }
+   #+end_src
+   *editor.dart*
+   #+begin_src dart
+     import 'dart:convert';
+     import 'dart:html';
+     import 'about.dart';
+
+     class TextEditor {
+       final TextAreaElement theEditor;
+       TextEditor(this.theEditor) {
+         theEditor
+           ..value = loadDocument()
+           ..onKeyUp.listen(saveDocument);
+       }
+
+       void clearDocument(MouseEvent event) {
+         theEditor.value = "";
+         saveDocument(event);
+       }
+
+       void saveDocument(dynamic event) {
+         window.localStorage["MyTextEditor"] = json.encode(theEditor.value);
+       }
+
+       String loadDocument() {
+         String readings = "";
+         String jsonString = window.localStorage["MyTextEditor"];
+         if (jsonString != null && jsonString.length > 0)
+           readings = json.decode(jsonString);
+         return readings;
+       }
+
+       void showAboutBox(MouseEvent event) {
+         AboutBox("https://ram535.github.io/", "Homepage", 300, 200);
+       }
+     }
+   #+end_src
+   *about.dart*
+   #+begin_src dart
+     import 'dart:html';
+     import 'dialog_base.dart';
+
+     class AboutBox extends Dialog {
+       final String linkUrl;
+       final String linkText;
+
+       AboutBox(this.linkUrl, this.linkText, int width, int height)
+           : super(width, height) {
+         HeadingElement title = HeadingElement.h1();
+         title.text = "About";
+         AnchorElement link = AnchorElement();
+         link
+           ..href = linkUrl
+           ..text = linkText;
+         contentBox..children.add(title)..children.add(link);
+       }
+     }
+   #+end_src
+
+   Here we create the class AboutBox which inhereit from Dialog class.
+   *super* allows us to call the constructor of Dialog class.
+   We are able to use the variables of Dialog class inside the constructor
+   of AboutBox class.

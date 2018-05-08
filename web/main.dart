@@ -9,6 +9,6 @@ void main() {
   ButtonInputElement btnClear = querySelector("#btnClearText");
   btnClear.onClick.listen(theEditor.clearDocument);
 
-  ButtonInputElement btnDialogBox = querySelector("#btnDialogBox");
-  btnDialogBox.onClick.listen(theEditor.showDialogBox);
+  ButtonInputElement btnAboutBox = querySelector("#btnAboutBox");
+  btnAboutBox.onClick.listen(theEditor.showAboutBox);
 }

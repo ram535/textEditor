@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:html';
-import 'dialog_base.dart';
+import 'about.dart';
 
 class TextEditor {
   final TextAreaElement theEditor;
@@ -27,7 +27,7 @@ class TextEditor {
     return readings;
   }
 
-  void showDialogBox(MouseEvent event) {
-    Dialog(200, 200);
+  void showAboutBox(MouseEvent event) {
+    AboutBox("https://ram535.github.io/", "Homepage", 300, 200);
   }
 }

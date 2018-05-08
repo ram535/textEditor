@@ -1,14 +1,16 @@
 import 'dart:html';
 
 class Dialog {
-  int width = 0;
-  int height = 0;
+  int width;
+  int height;
   DivElement dialogBox = DivElement();
+  DivElement contentBox = DivElement();
   Dialog(this.width, this.height) {
     dialogBox
       ..classes.toggle("dialog-box")
       ..style.width = "${width}px"
       ..style.height = "${height}px"
+      ..children.add(contentBox)
       ..children.add(makeButton());
     document.body.append(dialogBox);
   }
@@ -17,12 +19,12 @@ class Dialog {
     ButtonInputElement button = ButtonInputElement();
     button
       ..classes.toggle("dialog-box-button")
-      ..value = "CANCEL";
+      ..value = "OK";
     button.onClick.listen(remove);
     return button;
   }
 
-  void remove(MouseEvent me) {
+  void remove(MouseEvent event) {
     document.body.children.remove(dialogBox);
   }
 }
